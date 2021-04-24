@@ -23,17 +23,12 @@ def main():
     _output = Output.Output('rtmp://media.streamit.live/LiveApp/test')
     
     while True:
-        img = _input.capture()
-    # while not sink.is_eos():
-        # pass
-    # loop = GObject.MainLoop()
-    # bus = pipeline.get_bus()
-    # 
+        img = _input.Capture()
 
-    # pipeline.set_state(Gst.State.PLAYING)
+        # _.output.Render(img)
 
-    # Cleanup
-    # pipeline.set_state(Gst.State.NULL)
+        # if not _input.IsStreaming() or not output.IsStreaming():
+            # break
 
 if __name__ == "__main__":
     sys.exit(main())
