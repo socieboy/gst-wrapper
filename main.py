@@ -6,8 +6,8 @@
 import sys
 import gi
 sys.path.append(".")
-import Source 
-import Output 
+from Source import Source 
+from Output import Output 
 gi.require_version('Gst', '1.0')
 gi.require_version("GstApp", "1.0")
 from gi.repository import Gst
@@ -19,14 +19,14 @@ Gst.init(None)
 
 def main():
 
-    _input = Source.Source(0)
-    _output = Output.Output('rtmp://media.streamit.live/LiveApp/test')
+    _input = Source(0)
+    # _output = Output.Output('rtmp://media.streamit.live/LiveApp/test')
     
-    while True:
-        img = _input.Capture()
+    img = _input.capture()
 
         # _.output.Render(img)
 
+    # _input.close()
         # if not _input.IsStreaming() or not output.IsStreaming():
             # break
 

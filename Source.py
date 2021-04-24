@@ -1,25 +1,38 @@
+#!/usr/bin/env python3
+
+import sys
 import gi
+import time
+sys.path.append(".")
 gi.require_version('Gst', '1.0')
 gi.require_version("GstApp", "1.0")
 from gi.repository import Gst
+from utils.gst_bus import gst_message_print
+from RingBuffer import RingBuffer
+from Event import Event 
 
 class Source:
 
     def __init__(self, source):
+        ##
         self.source = source
         self.mAppSink = None
         self.mBus = None
         self.mPipeline = None
         self.isStreaming = False
+
+        self.mBufferRGB = RingBuffer()
+        self.mWaitEvent = Event()
+
         print("INFO -- Creating Gst Source")
-        self.init()
+        self.start()
         print("INFO -- Created Gst Source")
 
 
-    def init(self):
-
+    def start(self):
+        ##
         # Create pipeline from string
-        pipeStr = "nvarguscamerasrc name=camera sensor-id=" + str(self.source) + " ! " \
+        pipeStr = "nvarguscamerasrc sensor-id=" + str(self.source) + " ! " \
                  "video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, framerate=30/1, format=(string)NV12 ! " \
                  "nvvidconv flip-method=0 ! " \
                  "video/x-raw ! " \
@@ -54,26 +67,52 @@ class Source:
         return True
 
     def capture(self):
+        ##
         if not self.isStreaming:
             if not self.open():
                 return False
+        
+        if not self.mWaitEvent.wait(100):
+            return False
+
             
     def open(self):
+        ##
         if self.isStreaming:
             return True
-        print("Camera-- starting pipeline, transitioning to GST_STATE_PLAYING")
+        
+        print("Camera -- starting pipeline, transitioning to GST_STATE_PLAYING")
+        
         result = self.mPipeline.set_state(Gst.State.PLAYING)
-        self.isStreaming = True
 
+        if result == Gst.StateChangeReturn.ASYNC:
+            pass
+
+        elif result != Gst.StateChangeReturn.SUCCESS:
+            print("Camera -- failed to set pipeline state to PLAYING")
+            return False
+
+        self.__checkMsgBus()
+        self.__usleep(100)
+        self.__checkMsgBus()
+
+        self.isStreaming = True
+        return True
+
+    def close(self):
+        self.mPipeline.set_state(Gst.State.NULL)
 
     def __onEOS(self, appSink, userData = None):
+        ##
         print("Camera -- end of stream (EOS)")
 
     def __onPreroll(self, appSink, userData = None):
+        ##
         print("Camera -- onPreroll")
         return Gst.FlowReturn.OK
 
     def __onBuffer(self, appSink, userData = None):
+        ##
         print("Camera -- onBuffer")
         print(appSink)
         print(userData)
@@ -81,6 +120,7 @@ class Source:
             return Gst.FlowReturn.OK
 
         self.__checkBuffer()
+        self.__checkMsgBus()
 
         return Gst.FlowReturn.OK
     
@@ -111,12 +151,12 @@ class Source:
 
         # gstBuffer = Gst.gstSam(gstSample);
 
-    # def __checkMsgBus()
-    	# while(True):
-		    # msg = gst_bus_pop(self.mBus.get)
+    def __checkMsgBus(self):
+    	while(True):
+            msg = self.mBus.pop()
+            if not msg:
+                break
+            gst_message_print(self.mBus, msg, self)
 
-		# if not msg:
-		    # break
-
-		# gst_message_print(mBus, msg, this);
-		# gst_message_unref(msg);
+    def __usleep(self, x):
+        lambda x: time.sleep(x/1000000.0)

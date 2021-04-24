@@ -14,10 +14,10 @@ class Output():
         self.mNeedData = None
         self.mOutputPort = 0
         print("INFO -- Creating Gst Output")
-        self.init()
+        self.start()
         print("INFO -- Created Gst Output")
     
-    def init(self):
+    def start(self):
         # Create pipeline from string
         pipeStr = "appsrc name=appsrc is-live=true do-timestamp=true format=3 ! " \
                   "omxh264enc bitrate=4000000 ! " \
