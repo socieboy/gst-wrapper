@@ -19,7 +19,7 @@ Gst.init(None)
 
 def main():
 
-    _input = Source.Source(1)
+    _input = Source.Source(0)
     _output = Output.Output('rtmp://media.streamit.live/LiveApp/test')
     
     while True:

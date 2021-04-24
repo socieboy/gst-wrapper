@@ -97,19 +97,17 @@ class Source:
         (result, map) = self.mBus.map(Gst.MapFlags.READ)
         assert result
 
-        gstData = map.data
-	    gstSize = map.maxsize
+        # gstData = map.data
+        # gstSize = map.maxsize
 	
-	    if not gstData:
-		    print("Camera -- gst_buffer_map had NULL data pointer...")
-		    return
+	    # if not gstData:
+		#     print("Camera -- gst_buffer_map had NULL data pointer...")
+		#     return
 
-        if( map.maxsize > map.size) 
-        {
-            print("Camera -- map buffer size was less than max size");
-        }
+        # if map.maxsize > map.size:
+            # print("Camera -- map buffer size was less than max size")
 
-        gstCaps = gstSample.caps
+        # gstCaps = gstSample.caps
 
         # gstBuffer = Gst.gstSam(gstSample);
 
